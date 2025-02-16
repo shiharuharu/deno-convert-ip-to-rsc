@@ -8,6 +8,8 @@ async function handler(_req: Request): Promise<Response> {
   const autoClean = urlParse.searchParams.has("clean");
   const asnParam = urlParse.searchParams.get("asn");
   const asnList = asnParam ? asnParam.split(',') : [];
+  const v4Only = urlParse.searchParams.has("v4");
+  const v6Only = urlParse.searchParams.has("v6");
   
   const logCommands: string[] = [];
 
@@ -119,9 +121,11 @@ async function handler(_req: Request): Promise<Response> {
         }
       }
 
-      const cmdType = ipVersion === 4 ? "ip" : "ipv6";
-      script += `/${cmdType} firewall address-list add address=${entry} list="${listName}"\n`;
-      validCount++;
+      if((v4Only && ipVersion === 4) || (v6Only && ipVersion === 6) || (!v4Only && !v6Only)) {
+        const cmdType = ipVersion === 4 ? "ip" : "ipv6";
+        script += `/${cmdType} firewall address-list add address=${entry} list="${listName}"\n`;
+        validCount++;
+      }
     }
 
     script += `\n:log info "Process completed: ${validCount} valid, ${invalidCount} invalid entries"`;
