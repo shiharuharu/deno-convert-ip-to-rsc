@@ -30,8 +30,15 @@ async function handler(_req: Request): Promise<Response> {
 
     if (autoClean) {
       script += `:log info "Clearing address list: ${listName}"\n`;
-      script += `/ip firewall address-list remove [find list="${listName}"]\n`;
-      script += `/ipv6 firewall address-list remove [find list="${listName}"]\n\n`;
+
+      if(v4Only) {
+        script += `/ip firewall address-list remove [find list="${listName}"]\n`;
+      } else if(v6Only) {
+        script += `/ipv6 firewall address-list remove [find list="${listName}"]\n\n`;
+      } else {
+        script += `/ip firewall address-list remove [find list="${listName}]\n`;
+        script += `/ipv6 firewall address-list remove [find list="${listName}]\n\n`;
+      }
     }
 
     const entries: string[] = [];
