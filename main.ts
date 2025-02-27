@@ -32,12 +32,12 @@ async function handler(_req: Request): Promise<Response> {
       script += `:log info "Clearing address list: ${listName}"\n`;
 
       if(v4Only) {
-        script += `/ip firewall address-list remove [find list="${listName}"]\n`;
+        script += `do { /ip firewall address-list remove [find list="${listName}"] } on-error= {}\n`;
       } else if(v6Only) {
-        script += `/ipv6 firewall address-list remove [find list="${listName}"]\n\n`;
+        script += `do { /ipv6 firewall address-list remove [find list="${listName}"] } on-error= {}\n\n`;
       } else {
-        script += `/ip firewall address-list remove [find list="${listName}"]\n`;
-        script += `/ipv6 firewall address-list remove [find list="${listName}"]\n\n`;
+        script += `do { /ip firewall address-list remove [find list="${listName}"] } on-error= {}\n`;
+        script += `do { /ipv6 firewall address-list remove [find list="${listName}"] } on-error= {}\n\n`;
       }
     }
 
