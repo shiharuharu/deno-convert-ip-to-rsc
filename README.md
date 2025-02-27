@@ -28,6 +28,28 @@ do { /file remove $tmpFile } on-error={}
 }
 ```
 
+## 多数据源以`,`分割
+```
+:local listName "geo-ip-tunnel"
+:local remoteUrl "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/facebook.txt,https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/google.txt,https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/netflix.txt,https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/telegram.txt,https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/twitter.txt,https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/36459/ipv4-aggregated.txt,https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/138997/ipv4-aggregated.txt,https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/63473/ipv4-aggregated.txt,https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/16276/ipv4-aggregated.txt,https://raw.githubusercontent.com/ipverse/asn-ip/refs/heads/master/as/24940/ipv4-aggregated.txt"
+:local serviceUrl "https://convert-ip-to-rsc.deno.dev/?url=$remoteUrl&name=$listName&clean&v4"
+:local tmpFile "$listName.rsc"
+
+:log info "Starting GeoIP sync for list: $listName"
+do { /file remove $tmpFile } on-error={}
+/tool fetch url=$serviceUrl mode=https dst-path=$tmpFile
+:delay 1s
+
+:if ([/file find name=$tmpFile] = "") do={
+    :log error "Download failed: Unable to fetch file"
+} else={
+    :log info "Importing $tmpFile"
+    do { /import file-name=$tmpFile } on-error={ :log error "Import failed: Unable to import file" }
+    do { /file remove $tmpFile } on-error={}
+    :log info "Sync completed for $listName"
+}
+```
+
 ## 接口参数
 
 | 参数    | 必填 | 说明                                 |
