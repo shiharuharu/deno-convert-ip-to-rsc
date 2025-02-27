@@ -8,27 +8,22 @@
 
 ## RouterOS 脚本
 ```ros
-:local remoteUrl "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
 :local listName "geo-ip-cn"
-
-:local serviceUrl "https://convert-ip-to-rsc.deno.dev/?url=$remoteUrl&clean=1&name=$listName"
+:local remoteUrl "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
+:local serviceUrl "https://convert-ip-to-rsc.deno.dev/?url=$remoteUrl&name=$listName&v4&clean"
 :local tmpFile "$listName.rsc"
 
 :log info "Starting GeoIP sync for list: $listName"
-
 do { /file remove $tmpFile } on-error={}
-
 /tool fetch url=$serviceUrl mode=https dst-path=$tmpFile
+:delay 1s
+
 :if ([/file find name=$tmpFile] = "") do={
     :log error "Download failed: Unable to fetch file"
 } else={
     :log info "Importing $tmpFile"
-    
-    do { /import file-name=$tmpFile } on-error={
-        :log error "Import failed: Unable to import file"
-    }
+    do { /import file-name=$tmpFile } on-error={ :log error "Import failed: Unable to import file" }
     do { /file remove $tmpFile } on-error={}
-
     :log info "Sync completed for $listName"
 }
 ```
