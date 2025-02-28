@@ -130,7 +130,7 @@ async function handler(_req: Request): Promise<Response> {
 
       if((v4Only && ipVersion === 4) || (v6Only && ipVersion === 6) || (!v4Only && !v6Only)) {
         const cmdType = ipVersion === 4 ? "ip" : "ipv6";
-        script += `/${cmdType} firewall address-list add address=${entry} list="${listName}"\n`;
+        script += `do { /${cmdType} firewall address-list add address=${entry} list="${listName}" } on-error={}\n`;
         validCount++;
       }
     }
